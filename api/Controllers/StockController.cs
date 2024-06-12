@@ -8,34 +8,40 @@ namespace api;
 [Route("api/stock")]
 public class StockController : ControllerBase
 {
-    private readonly ApplicationDBContext _dbContext;
-    public StockController(ApplicationDBContext dbContext)
+    private readonly StockService _stockService;
+    public StockController(StockService stockService)
     {
-        _dbContext = dbContext;
+        _stockService = stockService;
     }
 
     [HttpGet]
-    public IActionResult GetAll(){
-
+    public IActionResult GetAll()
+    {
+        _stockService.GetAllAsync();
+        return Ok();
     }
 
-    [HttpGet({"id"})]
-    public IActionResult GetById(){
-
+    [HttpGet("id")]
+    public IActionResult GetById()
+    {
+        _stockService.Get
     }
 
     [HttpPost]
-    public IActionResult Create(){
+    public IActionResult Create()
+    {
 
     }
 
     [HttpPut]
-    public IActionResult Update(){
+    public IActionResult Update()
+    {
 
     }
 
-    [HttpDelete({"id"})]
-    public IActionResult Delete(){
+    [HttpDelete("id")]
+    public IActionResult Delete()
+    {
 
     }
 }
