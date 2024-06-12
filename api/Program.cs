@@ -1,8 +1,14 @@
 // configure services and DI
+using api.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddDbContext<ApplicationDBContext>(options => 
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DBConnectionString"))
+);
 
 // control http request pipeline
 var app = builder.Build();
