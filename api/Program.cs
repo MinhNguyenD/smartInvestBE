@@ -1,4 +1,5 @@
 // configure services and DI
+using api;
 using api.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,7 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<ApplicationDBContext>(options => 
+builder.Services.AddScoped<StockService>();
+builder.Services.AddDbContext<ApplicationDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DBConnectionString"))
 );
 
