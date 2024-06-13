@@ -1,7 +1,8 @@
 ﻿using api.Dtos;
+using api.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace api;
+namespace api.Controllers;
 
 
 [ApiController]
@@ -31,15 +32,19 @@ public class StockController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CreateStockDto createStockDto)
     {
-        await _stockService.CreateAsync(StockMapper.ToStockFromCreateDTO(createStockDto));
+        await _stockService.CreateAsync(createStockDto.ToStockFromCreateDTO());
         var stockModel = createStockDto.ToStockFromCreateDTO();
-        return CreatedAtAction(nameof(GetById), new { id = stockModel.Id}, StockMapper.ToStockDto(stockModel));
+        return CreatedAtAction(nameof(GetById), new { id = stockModel.Id }, stockModel.ToStockDto());
     }
 
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, UpdateStockDto updateStockDto)
-    {   
-        await _stockService.UpdateAsync(id, updateStockDto);
+    {
+        var stock = await _stockService.UpdateAsync(id, updateStockDto);
+        if (stock is null)
+        {
+            return NotFound();
+        }
         return NoContent();
     }
 

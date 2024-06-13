@@ -2,7 +2,7 @@
 using api.Dtos;
 using Microsoft.EntityFrameworkCore;
 
-namespace api;
+namespace api.Services;
 
 public class StockService
 {
@@ -31,16 +31,17 @@ public class StockService
     }
 
     public async Task<Stock?> UpdateAsync(int id, UpdateStockDto updateStockDto)
-    {   
+    {
         var stock = await _dbContext.Stocks.FindAsync(id);
-        if (stock == null)
+        if (stock is null)
         {
             return null;
         }
-        // mapper here
+        _dbContext.Entry(stock).CurrentValues.SetValues(updateStockDto);
+        await _dbContext.SaveChangesAsync();
         return stock;
     }
-    
+
     public async Task DeleteAsync(int id)
     {
         await _dbContext.Stocks.Where(stock => stock.Id == id).ExecuteDeleteAsync();
