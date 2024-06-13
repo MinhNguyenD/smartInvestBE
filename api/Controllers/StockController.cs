@@ -1,4 +1,4 @@
-﻿using api.Data;
+﻿using api.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api;
@@ -15,33 +15,38 @@ public class StockController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetAll()
+    public async Task<IActionResult> GetAll()
     {
-        _stockService.GetAllAsync();
-        return Ok();
+        var stocks = await _stockService.GetAllAsync();
+        return Ok(stocks);
     }
 
-    [HttpGet("id")]
-    public IActionResult GetById()
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetById(int id)
     {
-        _stockService.Get
+        var stock = await _stockService.GetByIdAsync(id);
+        return Ok(stock);
     }
 
     [HttpPost]
-    public IActionResult Create()
+    public async Task<IActionResult> Create(CreateStockDto createStockDto)
     {
-
+        await _stockService.CreateAsync(StockMapper.ToStockFromCreateDTO(createStockDto));
+        var stockModel = createStockDto.ToStockFromCreateDTO();
+        return CreatedAtAction(nameof(GetById), new { id = stockModel.Id}, StockMapper.ToStockDto(stockModel));
     }
 
-    [HttpPut]
-    public IActionResult Update()
-    {
-
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Update(int id, UpdateStockDto updateStockDto)
+    {   
+        await _stockService.UpdateAsync(id, updateStockDto);
+        return NoContent();
     }
 
-    [HttpDelete("id")]
-    public IActionResult Delete()
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id)
     {
-
+        await _stockService.DeleteAsync(id);
+        return NoContent();
     }
 }
