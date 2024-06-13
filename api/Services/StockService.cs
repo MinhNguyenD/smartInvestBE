@@ -1,4 +1,5 @@
 ﻿using api.Data;
+using api.Dtos;
 using Microsoft.EntityFrameworkCore;
 
 namespace api;
@@ -16,7 +17,7 @@ public class StockService
         return await _dbContext.Stocks.ToListAsync();
     }
 
-    public async Task<Stock?> GetByIdAsync(long id)
+    public async Task<Stock?> GetByIdAsync(int id)
     {
         var stock = await _dbContext.Stocks.FindAsync(id);
         return stock;
@@ -29,8 +30,8 @@ public class StockService
         return stock;
     }
 
-    public async Task<Stock?> UpdateAsync(long id, UpdateStockDto updateStockDto)
-    {
+    public async Task<Stock?> UpdateAsync(int id, UpdateStockDto updateStockDto)
+    {   
         var stock = await _dbContext.Stocks.FindAsync(id);
         if (stock == null)
         {
@@ -39,7 +40,8 @@ public class StockService
         // mapper here
         return stock;
     }
-    public async Task DeleteAsync(long id)
+    
+    public async Task DeleteAsync(int id)
     {
         await _dbContext.Stocks.Where(stock => stock.Id == id).ExecuteDeleteAsync();
     }
