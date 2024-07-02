@@ -1,11 +1,13 @@
 ﻿using api.Dtos;
 using api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers;
 
 
 [ApiController]
+[Authorize]
 [Route("api/stock")]
 public class StockController : ControllerBase
 {
