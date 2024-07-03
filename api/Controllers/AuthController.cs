@@ -64,8 +64,8 @@ public class AuthController : ControllerBase
         }
     }
 
-    [HttpPost("signin")]
-    public async Task<IActionResult> Signin([FromBody] SigninRequestDto signinRequestDto)
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] SigninRequestDto signinRequestDto)
     {
         var user = await _userManager.FindByEmailAsync(signinRequestDto.Email);
         if (user == null)
