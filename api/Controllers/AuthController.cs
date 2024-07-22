@@ -79,8 +79,8 @@ public class AuthController : ControllerBase
         }
         return Ok(new AuthUserDto
         {
-            Username = user.UserName,
-            Email = user.Email,
+            Username = user.UserName!,
+            Email = user.Email!,
             Token = _tokenService.GenerateToken(user)
         });
 
