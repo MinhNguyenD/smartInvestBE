@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace api;
+namespace portfolio.Models;
 
 [Table("Stocks")]
 public class Stock
@@ -17,5 +17,4 @@ public class Stock
     public decimal LastDiv {get; set;}
     public string Industry { get; set; } = string.Empty;
     public long MarketCap { get; set; }
-    public ICollection<Portfolio> Portfolios { get; set; } = new List<Portfolio>();
 }
