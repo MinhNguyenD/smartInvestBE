@@ -8,7 +8,7 @@ namespace api.Controllers;
 
 
 [ApiController]
-[Authorize]
+// [Authorize]
 [Route("api/stock")]
 public class StockController : ControllerBase
 {
