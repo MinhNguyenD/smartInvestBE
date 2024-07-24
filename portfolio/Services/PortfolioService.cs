@@ -35,15 +35,14 @@ public class PortfolioService : IPortfolioService
         var stock = await _dbContext.Stocks.FirstOrDefaultAsync(s => s.Symbol.Equals(symbol));
         if(stock == null){
             stock = await _marketDataService.FindStockBySymbolAsync(symbol);
-        } 
-
-        if(stock == null) {
-            throw new Exception("Stock not found");
-        }
-        else {
-            await _dbContext.Stocks.AddAsync(stock);
-            await _dbContext.SaveChangesAsync();
-        }
+            if(stock == null) {
+                throw new Exception("Stock not found");
+            }
+            else {
+                await _dbContext.Stocks.AddAsync(stock);
+                await _dbContext.SaveChangesAsync();
+            }
+        }       
         
         if(portfolio == null){
             portfolio = await CreatePortfolio(userId);

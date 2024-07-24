@@ -7,12 +7,11 @@ namespace portfolio.Data
     {
         public ApplicationDBContext(DbContextOptions<ApplicationDBContext> dbContextOptions) : base(dbContextOptions)
         {
-
         }
-
         public DbSet<Stock> Stocks { get; set; }
         public DbSet<Portfolio> Portfolios { get; set; }
         public DbSet<Holding> Holdings { get; set; }
+        public DbSet<Analysis> Analyses {get; set; }
 
 
 
@@ -33,6 +32,12 @@ namespace portfolio.Data
                 .HasOne(ps => ps.Stock)
                 .WithMany(s => s.Holdings)
                 .HasForeignKey(ps => ps.StockId);
-            }
+
+                // Many-To-One relationship between Analysis and Stock
+            builder.Entity<Stock>()
+                   .HasMany(a => a.Analyses)
+                   .WithOne(s => s.Stock)
+                   .HasForeignKey(p => p.StockId);
+        }    
     }
 }
