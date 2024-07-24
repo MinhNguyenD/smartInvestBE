@@ -4,7 +4,7 @@ using System.Text;
 using api.Models;
 using Microsoft.IdentityModel.Tokens;
 
-namespace api;
+namespace api.Services;
 
 public class TokenService
 {
@@ -21,8 +21,9 @@ public class TokenService
     {
         var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName)
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+            new Claim(JwtRegisteredClaimNames.Email, user.Email!),
+            new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName!)
         };
         var signingCred = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
         var tokenDescriptor = new SecurityTokenDescriptor

@@ -3,12 +3,13 @@ using portfolio.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using portfolio.Mappers;
+using System.Security.Claims;
 
 namespace api.Controllers;
 
 
 [ApiController]
-// [Authorize]
+[Authorize]
 [Route("api/stock")]
 public class StockController : ControllerBase
 {

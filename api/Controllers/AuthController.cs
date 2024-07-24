@@ -1,7 +1,6 @@
 ﻿using api.Models;
-using Azure.Identity;
+using api.Services;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api;
