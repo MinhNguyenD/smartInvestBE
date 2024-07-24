@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using portfolio.Dtos;
 using portfolio.Mappers;
@@ -12,6 +13,8 @@ namespace portfolio.Services
     public interface IMarketDataService
     {
         Task<Stock> FindStockBySymbolAsync(string symbol);
+        Task<string?> GetRealTimeStockPriceAsync(string symbol);
+        Task<string?> GetHistoricalStockPriceAsync(string symbol)
     }
 
     public class MarketDataService : IMarketDataService
@@ -39,6 +42,48 @@ namespace portfolio.Services
                         return stock.ToStockFromMarketData();;
                     }
                     return null;
+                }
+                return null;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        }
+
+        public async Task<string?> GetRealTimeStockPriceAsync(string symbol)
+        {
+            try
+            {
+                var result = await _httpClient.GetAsync($"https://financialmodelingprep.com/api/v3/quote/{symbol}?apikey={_config["MarketDataApiKey"]}");
+                if (result.IsSuccessStatusCode)
+                {
+                    var content = await result.Content.ReadAsStringAsync();
+                    if(content.IsNullOrEmpty()){
+                        return null;
+                    }
+                    return content;
+                }
+                return null;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        }
+
+        public async Task<string?> GetHistoricalStockPriceAsync(string symbol)
+        {
+            try
+            {
+                var result = await _httpClient.GetAsync($"https://financialmodelingprep.com/api/v3/historical-price-full/{symbol}?apikey={_config["MarketDataApiKey"]}");
+                if (result.IsSuccessStatusCode)
+                {
+                    var content = await result.Content.ReadAsStringAsync();
+                    if(content.IsNullOrEmpty()){
+                        return null;
+                    }
+                    return content;
                 }
                 return null;
             }

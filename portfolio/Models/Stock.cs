@@ -20,4 +20,5 @@ public class Stock
     public string Industry { get; set; } = string.Empty;
     public long MarketCap { get; set; }
     public ICollection<Holding> Holdings { get; set; } = new List<Holding>();
+    public ICollection<Analysis> Analyses { get; set; } = new List<Analysis>();
 }
