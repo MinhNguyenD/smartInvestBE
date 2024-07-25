@@ -55,10 +55,7 @@ public class StockController : ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var deletedStock = await _stockService.DeleteAsync(id);
-        if(deletedStock == null){
-            return NotFound();
-        }
+        await _stockService.DeleteAsync(id);
         return NoContent();
     }
 }

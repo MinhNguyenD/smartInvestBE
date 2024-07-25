@@ -11,7 +11,7 @@ namespace portfolio.Models
         public int Id { get; set; }
         public string Content {get; set;}
         public string UserId { get; set; }
-        public string StockId {get; set;}
+        public int StockId {get; set;}
         public Stock Stock {get; set;}
     }
 }

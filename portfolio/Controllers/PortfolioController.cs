@@ -21,7 +21,7 @@ namespace portfolio.Controllers
         [HttpGet]
         public async Task<IActionResult> GetPortfolio(){
             var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-            if(userId.IsNullOrEmpty()){
+            if(userId == null){
                 return Unauthorized();
             }
             var stockHoldings = new List<Stock>();
@@ -37,7 +37,7 @@ namespace portfolio.Controllers
         [HttpPost]
         public async Task<IActionResult> AddStockPortfolio(string symbol){
             var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-            if(userId.IsNullOrEmpty()){
+            if(userId == null){
                 return Unauthorized();
             }
             try {
@@ -52,7 +52,7 @@ namespace portfolio.Controllers
         [HttpDelete]
         public async Task<IActionResult> RemoveStockPortfolio(string symbol){
             var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-            if(userId.IsNullOrEmpty()){
+            if(userId == null){
                 return Unauthorized();
             }
             try {

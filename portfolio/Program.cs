@@ -69,10 +69,16 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddHttpClient();
+builder.Services.AddHttpClient<MarketDataService>();
 builder.Services.AddScoped<StockService>();
 builder.Services.AddScoped<IMarketDataService, MarketDataService>();
+builder.Services.AddScoped<IStockService, StockService>();
 builder.Services.AddScoped<IPortfolioService, PortfolioService>();
+builder.Services.AddScoped<IAnalysisService, AnalysisService>();
+builder.Services.AddHttpClient<AnalysisService>(client =>
+{
+    client.DefaultRequestHeaders.Add("Authorization", $"Bearer sk-proj-izKpEKyTxi7rAzyy5kPuT3BlbkFJJIEAe1ejaiaEcbKgXxAN");
+});
 
 var app = builder.Build();
 
