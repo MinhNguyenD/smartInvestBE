@@ -11,7 +11,7 @@ using portfolio.Data;
 namespace portfolio.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20240724034717_UpdateSchema")]
+    [Migration("20240725000053_UpdateSchema")]
     partial class UpdateSchema
     {
         /// <inheritdoc />
@@ -23,6 +23,32 @@ namespace portfolio.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
+
+            modelBuilder.Entity("portfolio.Models.Analysis", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("StockId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StockId");
+
+                    b.ToTable("Analyses");
+                });
 
             modelBuilder.Entity("portfolio.Models.Holding", b =>
                 {
@@ -90,6 +116,17 @@ namespace portfolio.Migrations
                     b.ToTable("stocks");
                 });
 
+            modelBuilder.Entity("portfolio.Models.Analysis", b =>
+                {
+                    b.HasOne("portfolio.Models.Stock", "Stock")
+                        .WithMany("Analyses")
+                        .HasForeignKey("StockId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Stock");
+                });
+
             modelBuilder.Entity("portfolio.Models.Holding", b =>
                 {
                     b.HasOne("portfolio.Models.Portfolio", "Portfolio")
@@ -116,6 +153,8 @@ namespace portfolio.Migrations
 
             modelBuilder.Entity("portfolio.Models.Stock", b =>
                 {
+                    b.Navigation("Analyses");
+
                     b.Navigation("Holdings");
                 });
 #pragma warning restore 612, 618

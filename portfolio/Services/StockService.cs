@@ -5,7 +5,16 @@ using portfolio.Models;
 
 namespace portfolio.Services;
 
-public class StockService
+public interface IStockService{
+    Task<List<Stock>> GetAllAsync();
+    Task<Stock?> GetByIdAsync(int id);
+    Task<Stock?> GetBySymbolAsync(string symbol);
+    Task<Stock> CreateAsync(Stock stock);
+    Task<Stock?> UpdateAsync(int id, UpdateStockDto updateStockDto);
+    Task<Stock?> DeleteAsync(int id);
+}
+
+public class StockService : IStockService
 {
     private readonly ApplicationDBContext _dbContext;
     public StockService(ApplicationDBContext dbContext)
@@ -21,6 +30,13 @@ public class StockService
     public async Task<Stock?> GetByIdAsync(int id)
     {
         var stock = await _dbContext.Stocks.FindAsync(id);
+        return stock;
+    }
+
+    
+    public async Task<Stock?> GetBySymbolAsync(string symbol)
+    {
+        var stock = await _dbContext.Stocks.FirstOrDefaultAsync(s => s.Symbol.Equals(symbol));
         return stock;
     }
 

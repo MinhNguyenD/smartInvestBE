@@ -13,8 +13,6 @@ namespace portfolio.Data
         public DbSet<Holding> Holdings { get; set; }
         public DbSet<Analysis> Analyses {get; set; }
 
-
-
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

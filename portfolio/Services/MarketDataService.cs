@@ -14,7 +14,8 @@ namespace portfolio.Services
     {
         Task<Stock> FindStockBySymbolAsync(string symbol);
         Task<string?> GetRealTimeStockPriceAsync(string symbol);
-        Task<string?> GetHistoricalStockPriceAsync(string symbol)
+        Task<string?> GetFinancialStatement(string symbol);
+        Task<string?> GetKeyMetrics(string symbol);
     }
 
     public class MarketDataService : IMarketDataService
@@ -39,7 +40,7 @@ namespace portfolio.Services
                     var stock = tasks[0];
                     if (stock != null)
                     {
-                        return stock.ToStockFromMarketData();;
+                        return stock.ToStockFromMarketData();
                     }
                     return null;
                 }
@@ -53,30 +54,26 @@ namespace portfolio.Services
 
         public async Task<string?> GetRealTimeStockPriceAsync(string symbol)
         {
-            try
-            {
-                var result = await _httpClient.GetAsync($"https://financialmodelingprep.com/api/v3/quote/{symbol}?apikey={_config["MarketDataApiKey"]}");
-                if (result.IsSuccessStatusCode)
-                {
-                    var content = await result.Content.ReadAsStringAsync();
-                    if(content.IsNullOrEmpty()){
-                        return null;
-                    }
-                    return content;
-                }
-                return null;
-            }
-            catch (Exception e)
-            {
-                return null;
-            }
+            var apiUri = $"https://financialmodelingprep.com/api/v3/quote/{symbol}?apikey={_config["MarketDataApiKey"]}";
+            return await GetMarketData(apiUri);
         }
 
-        public async Task<string?> GetHistoricalStockPriceAsync(string symbol)
+        public async Task<string?> GetFinancialStatement(string symbol)
         {
+            var apiUri = $"https://financialmodelingprep.com/api/v3/financials/income-statement/{symbol}?apikey={_config["MarketDataApiKey"]}";
+            return await GetMarketData(apiUri);
+        }
+
+        public async Task<string?> GetKeyMetrics(string symbol)
+        {
+            var apiUri = $"https://financialmodelingprep.com/api/v3/key-metrics/{symbol}?apikey={_config["MarketDataApiKey"]}";
+            return await GetMarketData(apiUri);
+        }
+
+        private async Task<string?> GetMarketData(string apiUri){
             try
             {
-                var result = await _httpClient.GetAsync($"https://financialmodelingprep.com/api/v3/historical-price-full/{symbol}?apikey={_config["MarketDataApiKey"]}");
+                var result = await _httpClient.GetAsync(apiUri);
                 if (result.IsSuccessStatusCode)
                 {
                     var content = await result.Content.ReadAsStringAsync();

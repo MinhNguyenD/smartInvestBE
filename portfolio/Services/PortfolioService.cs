@@ -48,12 +48,12 @@ public class PortfolioService : IPortfolioService
             portfolio = await CreatePortfolio(userId);
         }
         else {
-            
+            // check if added stock already in portfolio
+            if(portfolio!.Holdings.Any(h => h.Stock.Symbol.ToLower().Equals(symbol.ToLower()))){
+                throw new Exception("Stock is already saved");
+            }
         }
-        // check if added stock already in portfolio
-        if(portfolio!.Holdings.Any(h => h.Stock.Symbol.ToLower().Equals(symbol.ToLower()))){
-            throw new Exception("Stock is already saved");
-        }
+       
  
         var holding = new Holding{
             StockId = stock.Id,
