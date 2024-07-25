@@ -32,7 +32,7 @@ namespace portfolio.Services
             _config = configuration;
             _httpClient = httpClient;
             _marketDataService = marketDataService;
-            _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer sk-proj-izKpEKyTxi7rAzyy5kPuT3BlbkFJJIEAe1ejaiaEcbKgXxAN");
+            _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer ");
         }  
 
         public async Task<Analysis?> CreateStockAnalysisAsync(string userId, string symbol){
@@ -46,7 +46,7 @@ namespace portfolio.Services
                     new { role = "user", content = $@"Analyze the following stock data and provide a detailed report. 
 Your report should include not only a summary of the data but also insights, trends, and actionable analysis that an investor might find useful. 
 Consider factors like price movements, trading volume, financial health, valuation metrics, and market conditions. 
-Highlight any potential risks or opportunities, and offer recommendations for investors. :\n{stockData}\nPlease format the response with HTML tags and put it in a <div> element, ensuring the response is ready to be rendered directly on a React, Typescript, Tailwind css web page without any escape characters or unnecessary formatting symbols. Instead of using html heading tag, use <p> with tailwind css text-xl for headings, and text-sm for regular text." }
+Highlight any potential risks or opportunities, and offer recommendations for investors. :\n{stockData}\nPlease format the response with HTML tags and put it in a <div> element, ensuring the response is ready to be rendered directly on a React, Typescript, Tailwind css web page without any escape characters or unnecessary formatting symbols." }
                 }
             };
             var json = JsonConvert.SerializeObject(requestBody);

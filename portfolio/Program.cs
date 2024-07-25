@@ -77,7 +77,7 @@ builder.Services.AddScoped<IPortfolioService, PortfolioService>();
 builder.Services.AddScoped<IAnalysisService, AnalysisService>();
 builder.Services.AddHttpClient<AnalysisService>(client =>
 {
-    client.DefaultRequestHeaders.Add("Authorization", $"Bearer sk-proj-izKpEKyTxi7rAzyy5kPuT3BlbkFJJIEAe1ejaiaEcbKgXxAN");
+    client.DefaultRequestHeaders.Add("Authorization", $"Bearer ");
 });
 
 var app = builder.Build();
