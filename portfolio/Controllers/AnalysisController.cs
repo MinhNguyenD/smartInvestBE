@@ -117,7 +117,7 @@ namespace portfolio.Controllers
                     TopicArn = topicArn,
                     ReturnSubscriptionArn = true,
                     Protocol = "email",
-                    Endpoint = "MinhNguyen@dal.ca",
+                    Endpoint = userEmail,
                 };
 
                 var response = await _snsClient.SubscribeAsync(subscribeRequest);
