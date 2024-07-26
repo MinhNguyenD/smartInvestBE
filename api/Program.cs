@@ -47,9 +47,8 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 });
 
-builder.Services.AddDbContext<ApplicationDBContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DBConnectionString"))
-);
+builder.Services.AddDbContext<ApplicationDBContext>(options => options.UseMySql(builder.Configuration.GetConnectionString("DbConnectionString"), new MySqlServerVersion(new Version(8, 0, 35))));
+
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
