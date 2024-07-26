@@ -5,8 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using OpenAI_API;
-using OpenAI_API.Completions;
 using portfolio.Data;
 using portfolio.Models;
 
@@ -33,7 +31,7 @@ namespace portfolio.Services
             _config = configuration;
             _httpClient = httpClient;
             _marketDataService = marketDataService;
-            _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer sk-proj-tvJuFwpWpwcKxQCdR6FvT3BlbkFJ6BOpRwhJ1ijaqcgbZitF");
+            _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer ");
         }  
 
         public async Task<Analysis?> CreateStockAnalysisAsync(string userId, string symbol){

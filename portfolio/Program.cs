@@ -1,3 +1,4 @@
+using Amazon.SimpleNotificationService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -69,6 +70,8 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
+builder.Services.AddAWSService<IAmazonSimpleNotificationService>();
 builder.Services.AddHttpClient<MarketDataService>();
 builder.Services.AddScoped<StockService>();
 builder.Services.AddScoped<IMarketDataService, MarketDataService>();
