@@ -15,6 +15,7 @@ namespace portfolio.Services
     public interface IAnalysisService {
         Task<Analysis?> CreateStockAnalysisAsync(string userId, string symbol);
         Task<List<Analysis>> GetAnalysesAsync(string userId);
+        Task<Analysis?> GetAnalysisByIdAsync(int id);
         Task<Analysis?> GetAnalysisByStockAsync(string userId, string symbol);
         Task<Analysis?> DeleteAnalysisAsync(int analysisId);
     }
@@ -32,7 +33,7 @@ namespace portfolio.Services
             _config = configuration;
             _httpClient = httpClient;
             _marketDataService = marketDataService;
-            _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer ");
+            _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer sk-proj-tvJuFwpWpwcKxQCdR6FvT3BlbkFJ6BOpRwhJ1ijaqcgbZitF");
         }  
 
         public async Task<Analysis?> CreateStockAnalysisAsync(string userId, string symbol){
@@ -46,7 +47,7 @@ namespace portfolio.Services
                     new { role = "user", content = $@"Analyze the following stock data and provide a detailed report. 
 Your report should include not only a summary of the data but also insights, trends, and actionable analysis that an investor might find useful. 
 Consider factors like price movements, trading volume, financial health, valuation metrics, and market conditions. 
-Highlight any potential risks or opportunities, and offer recommendations for investors. :\n{stockData}\nPlease format the response with HTML tags and put it in a <div> element, ensuring the response is ready to be rendered directly on a React, Typescript, Tailwind css web page without any escape characters or unnecessary formatting symbols." }
+Highlight any potential risks or opportunities, and offer recommendations for investors. :\n{stockData}\nPlease format the response with HTML tags and put it in an empty <div> element (div has not style), ensuring the response is ready to be rendered directly on a React, Typescript, Tailwind css web page without any escape characters or unnecessary formatting symbols." }
                 }
             };
             var json = JsonConvert.SerializeObject(requestBody);
@@ -69,6 +70,8 @@ Highlight any potential risks or opportunities, and offer recommendations for in
 
             Analysis analysis = new Analysis {
                 UserId = userId,
+                StockSymbol = symbol,
+                DateCreated =  DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                 Content = analysisResponse,
                 StockId = stock.Id
             };
@@ -94,6 +97,11 @@ Highlight any potential risks or opportunities, and offer recommendations for in
                 await _dbContext.SaveChangesAsync();
             }
             var analysis = _dbContext.Analyses.FirstOrDefault(a => a.UserId.Equals(userId) && a.StockId == stock!.Id);
+            return analysis;
+        }
+
+        public async Task<Analysis?> GetAnalysisByIdAsync(int id){
+            var analysis = await _dbContext.Analyses.FindAsync(id);
             return analysis;
         }
 

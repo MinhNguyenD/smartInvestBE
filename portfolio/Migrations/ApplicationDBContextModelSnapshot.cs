@@ -33,8 +33,16 @@ namespace portfolio.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("DateCreated")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<int>("StockId")
                         .HasColumnType("int");
+
+                    b.Property<string>("StockSymbol")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("UserId")
                         .IsRequired()

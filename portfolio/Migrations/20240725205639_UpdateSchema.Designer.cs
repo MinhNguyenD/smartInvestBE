@@ -11,7 +11,7 @@ using portfolio.Data;
 namespace portfolio.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20240725000053_UpdateSchema")]
+    [Migration("20240725205639_UpdateSchema")]
     partial class UpdateSchema
     {
         /// <inheritdoc />
@@ -36,8 +36,16 @@ namespace portfolio.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("DateCreated")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<int>("StockId")
                         .HasColumnType("int");
+
+                    b.Property<string>("StockSymbol")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("UserId")
                         .IsRequired()

@@ -13,7 +13,7 @@ namespace portfolio.Controllers
 {
     [ApiController]
     [Authorize]
-    [Route("/api/analysis")]
+    [Route("/api/analyses")]
     public class AnalysisController : ControllerBase
     {
         private readonly IAnalysisService _analyzeService;
@@ -35,7 +35,26 @@ namespace portfolio.Controllers
             return Ok(analyses);
         }
 
-        [HttpGet("/{symbol}")]
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetAnalysisByIdAsync(int id)
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if(userId == null){
+                return Unauthorized();
+            }
+            try{
+                var analysis = await _analyzeService.GetAnalysisByIdAsync(id);
+                if(analysis == null){
+                    return NotFound();
+                }
+                return Ok(analysis);
+            }
+            catch(Exception e){
+                return StatusCode(500, e.Message);
+            }
+        }
+
+        [HttpGet("/symbol/{symbol}")]
         public async Task<IActionResult> GetAnalysisByStockAsync(string symbol)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
@@ -72,7 +91,7 @@ namespace portfolio.Controllers
             }
         }
 
-        [HttpDelete("/{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteAnalysisAsync(int id){
             await _analyzeService.DeleteAnalysisAsync(id);
             return NoContent();
