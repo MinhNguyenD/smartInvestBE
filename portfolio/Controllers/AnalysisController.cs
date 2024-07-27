@@ -102,6 +102,7 @@ namespace portfolio.Controllers
         public async Task<IActionResult> SendEmail(int id){
             var userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var username = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+            _topic += username;
             var analysis = await _analyzeService.GetAnalysisByIdAsync(id);
             if(analysis == null){
                 return NotFound("Analysis not found");
