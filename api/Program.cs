@@ -8,10 +8,18 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Newtonsoft;
+using Amazon;
 
 var builder = WebApplication.CreateBuilder(args);
-
+var environment = builder.Environment.EnvironmentName;
+var appName = builder.Environment.ApplicationName;
+builder.Configuration.AddSecretsManager(region: RegionEndpoint.USEast1, configurator: config => {
+    config.SecretFilter = record => record.Name.StartsWith($"{environment}_{appName}_");
+    config.KeyGenerator = (_, name) => name
+                    .Replace($"{environment}_{appName}_", string.Empty)
+                    .Replace("__", ":");
+});
+builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(option =>
@@ -78,7 +86,7 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = builder.Configuration["JWT:Audience"],
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(
-            System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"])
+            System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]!)
         )
     };
 });
