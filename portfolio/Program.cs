@@ -1,3 +1,4 @@
+using Amazon;
 using Amazon.SimpleNotificationService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -7,9 +8,16 @@ using portfolio.Data;
 using portfolio.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-
+var environment = builder.Environment.EnvironmentName;
+var appName = builder.Environment.ApplicationName;
+builder.Configuration.AddSecretsManager(region: RegionEndpoint.USEast1, configurator: config => {
+    config.SecretFilter = record => record.Name.StartsWith($"{environment}_{appName}_");
+    config.KeyGenerator = (_, name) => name
+                    .Replace($"{environment}_{appName}_", string.Empty)
+                    .Replace("__", ":");
+});
+builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
 // Add services to the container.
-
 builder.Services.AddControllers();
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
@@ -65,7 +73,7 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = builder.Configuration["JWT:Audience"],
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(
-            System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"])
+            System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]!)
         )
     };
 });
