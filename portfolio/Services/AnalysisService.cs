@@ -31,7 +31,8 @@ namespace portfolio.Services
             _config = configuration;
             _httpClient = httpClient;
             _marketDataService = marketDataService;
-            _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer ");
+            var authToken = "Bearer " + _config["OpenAI:Key"];
+            _httpClient.DefaultRequestHeaders.Add("Authorization", authToken);
         }  
 
         public async Task<Analysis?> CreateStockAnalysisAsync(string userId, string symbol){
