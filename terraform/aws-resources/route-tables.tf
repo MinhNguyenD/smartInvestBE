@@ -21,7 +21,7 @@ resource "aws_route_table" "smartinvest-private-rtb" {
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.smartinvest-ig.id
+    gateway_id = aws_nat_gateway.smartinvest-natgw.id
   }
 
   route {

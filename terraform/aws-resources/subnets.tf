@@ -15,6 +15,7 @@ resource "aws_subnet" "smartinvest-private-subnet-1a" {
   map_public_ip_on_launch = false
   tags = {
     Name = "smartinvest-private-subnet-1a"
+    "kubernetes.io/role/internal-elb" = 1
   }
 }
 
@@ -26,5 +27,6 @@ resource "aws_subnet" "smartinvest-private-subnet-1b" {
   map_public_ip_on_launch = false
   tags = {
     Name = "smartinvest-private-subnet-1b"
+    "kubernetes.io/role/internal-elb" = 1
   }
 }
