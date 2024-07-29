@@ -1,4 +1,4 @@
-resource "aws_security_group" "smartinvest-ec2-fe" {
+resource "aws_security_group" "smartinvest-ec2-fe-sg" {
   name        = "smartinvest-ec2-fe"
   description = "Allow HTTPs traffic to EC2 front end"
   vpc_id      = aws_vpc.main.id
