@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smartinvest-user-deployment
+  labels:
+    app: smartinvest-user
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: smartinvest-user
+  template:
+    metadata:
+      labels:
+        app: smartinvest-user
+    spec:
+      containers:
+        - name: smartinvest-user
+          image: 309238126949.dkr.ecr.us-east-1.amazonaws.com/smartinvest:smartinvestbeuser
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+      imagePullSecrets:
+        - name: ecr-secret
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smartinvest-user-lb
+spec:
+  type: LoadBalancer
+  selector:
+    app: smartinvest-user
+  ports:
+    - port: 80
+      targetPort: 80
