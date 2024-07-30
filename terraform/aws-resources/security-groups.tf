@@ -30,3 +30,25 @@ resource "aws_security_group" "smartinvest-ec2-fe-sg" {
     Name = "smartinvest-ec2-fe"
   }
 }
+
+resource "aws_security_group" "smartinvest-rds-sg" {
+  name        = "smartinvest-rds-sg"
+  description = "Allow Database request traffic to RDS"
+  vpc_id      = aws_vpc.main.id
+  ingress {
+    from_port        = 3306
+    to_port          = 3306
+    protocol         = "tcp"
+    cidr_blocks      = ["10.0.0.0/16"]
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["10.0.0.0/16"] # all internal vpc traffic
+  }
+  tags = {
+    Name = "smartinvest-rds-sg"
+  }
+}

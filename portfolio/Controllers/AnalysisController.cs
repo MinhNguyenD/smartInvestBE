@@ -16,7 +16,7 @@ namespace portfolio.Controllers
 {
     [ApiController]
     [Authorize]
-    [Route("/api/analyses")]
+    [Route("api/analyses")]
     public class AnalysisController : ControllerBase
     {
         private readonly IAnalysisService _analyzeService;
