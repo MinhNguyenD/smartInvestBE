@@ -30,3 +30,12 @@ resource "aws_subnet" "smartinvest-private-subnet-1b" {
     "kubernetes.io/role/internal-elb" = 1
   }
 }
+
+resource "aws_db_subnet_group" "rds-subnet-group" {
+  name       = "rds_subnet_group"
+  subnet_ids = [aws_subnet.smartinvest-private-subnet-1a.id, aws_subnet.smartinvest-private-subnet-1b.id]
+
+  tags = {
+    Name = "rds_subnet_group"
+  }
+}
