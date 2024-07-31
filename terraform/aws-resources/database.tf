@@ -3,7 +3,6 @@ resource "aws_db_instance" "smartinvest-rds-user" {
   allocated_storage    = 10
   db_name              = "user"
   engine               = "mysql"
-  port                 = 3306
   engine_version       = "8.0.35"
   instance_class       = "db.t3.micro"
   username             = "minh"
@@ -20,9 +19,8 @@ resource "aws_db_instance" "smartinvest-rds-user" {
 resource "aws_db_instance" "smartinvest-rds-portfolio" {
   identifier = "smartinvest-rds-portfolio"
   allocated_storage    = 10
-  db_name              = "mydb"
+  db_name              = "portfolio"
   engine               = "mysql"
-  port                 = 3306
   engine_version       = "8.0.35"
   instance_class       = "db.t3.micro"
   username             = "minh"
