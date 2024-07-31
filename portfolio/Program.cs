@@ -9,11 +9,11 @@ using portfolio.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var environment = builder.Environment.EnvironmentName;
-var appName = builder.Environment.ApplicationName;
+var microserviceName = builder.Configuration["MicroserviceName"];
 builder.Configuration.AddSecretsManager(region: RegionEndpoint.USEast1, configurator: config => {
-    config.SecretFilter = record => record.Name.StartsWith($"{environment}_{appName}_");
+    config.SecretFilter = record => record.Name.StartsWith($"{environment}_{microserviceName}_");
     config.KeyGenerator = (_, name) => name
-                    .Replace($"{environment}_{appName}_", string.Empty)
+                    .Replace($"{environment}_{microserviceName}_", string.Empty)
                     .Replace("__", ":");
 });
 builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
