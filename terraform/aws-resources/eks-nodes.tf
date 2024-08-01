@@ -1,4 +1,4 @@
-resource "aws_eks_node_group" "example" {
+resource "aws_eks_node_group" "smartinvest-eks-ng" {
   cluster_name    = aws_eks_cluster.smartinvest-cluster.name
   node_group_name = "smartinvest-wg"
   node_role_arn   = data.aws_iam_role.LabRole.arn
@@ -9,7 +9,7 @@ resource "aws_eks_node_group" "example" {
   instance_types = [ "t3.small" ]
   scaling_config {
     desired_size = 2
-    max_size     = 3
+    max_size     = 4
     min_size     = 1
   }
 
@@ -17,6 +17,6 @@ resource "aws_eks_node_group" "example" {
     max_unavailable = 1
   }
   tags = {
-    Name = "smartinvest-wg"
+    Name = "smartinvest-eks-ng"
   }
 }
