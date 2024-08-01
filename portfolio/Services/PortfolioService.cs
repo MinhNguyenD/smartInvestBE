@@ -34,7 +34,12 @@ public class PortfolioService : IPortfolioService
         // check if stock in db
         var stock = await _dbContext.Stocks.FirstOrDefaultAsync(s => s.Symbol.Equals(symbol));
         if(stock == null){
-            stock = await _marketDataService.FindStockBySymbolAsync(symbol);
+            try{
+                stock = await _marketDataService.FindStockBySymbolAsync(symbol);
+            }
+            catch(Exception e){
+                throw new Exception(e.Message); 
+            }
             if(stock == null) {
                 throw new Exception("Stock not found");
             }

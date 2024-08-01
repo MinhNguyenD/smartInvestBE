@@ -24,12 +24,23 @@ spec:
         - name: ecr-secret
 
 ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: smartinvest-portfolio-lb
+# spec:
+#   type: LoadBalancer
+#   selector:
+#     app: smartinvest-portfolio
+#   ports:
+#     - port: 80
+#       targetPort: 80
 apiVersion: v1
 kind: Service
 metadata:
-  name: smartinvest-portfolio-lb
+  name: smartinvest-portfolio-cip
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: smartinvest-portfolio
   ports:

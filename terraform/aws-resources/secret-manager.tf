@@ -16,7 +16,7 @@ data "aws_secretsmanager_secret" "smartinvest-portfolio-jwt-secret" {
 }
 
 data "aws_secretsmanager_secret" "smartinvest-portfolio-marketdata-secret" {
-  arn = "arn:aws:secretsmanager:us-east-1:309238126949:secret:Production_Portfolio__MarketDataApiKey-lto4wG"
+  arn = "arn:aws:secretsmanager:us-east-1:309238126949:secret:Production_Portfolio_MarketData__Key-xCmygR"
 }
 
 data "aws_secretsmanager_secret" "smartinvest-portfolio-OpenAI-secret" {
@@ -57,7 +57,7 @@ data "aws_secretsmanager_secret" "smartinvest-portfolio-OpenAI-secret" {
 # }
 
 # resource "aws_secretsmanager_secret" "smartinvest-portfolio-marketdata-secret" {
-#   name = "Production_Portfolio__MarketDataApiKey"
+#   name = "Production_Portfolio_MarketData__Key"
 #   description = "Market data api key"
 #   lifecycle {
 #     prevent_destroy = true
