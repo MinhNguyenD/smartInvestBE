@@ -22,17 +22,20 @@ namespace portfolio.Services
     {
         private HttpClient _httpClient;
         private IConfiguration _config;
+        private readonly string _marketDataKey;
+
         public MarketDataService(HttpClient httpClient, IConfiguration config)
         {
             _httpClient = httpClient;
             _config = config;
+            _marketDataKey = config["MarketData:Key"];
         }
         
         public async Task<Stock> FindStockBySymbolAsync(string symbol)
         {
             try
             {
-                var result = await _httpClient.GetAsync($"https://financialmodelingprep.com/api/v3/profile/{symbol}?apikey={_config["MarketDataApiKey"]}");
+                var result = await _httpClient.GetAsync($"https://financialmodelingprep.com/api/v3/profile/{symbol}?apikey={_marketDataKey}");
                 if (result.IsSuccessStatusCode)
                 {
                     var content = await result.Content.ReadAsStringAsync();
@@ -48,25 +51,25 @@ namespace portfolio.Services
             }
             catch (Exception e)
             {
-                return null;
+                throw new Exception($"Market data api request failed");
             }
         }
 
         public async Task<string?> GetRealTimeStockPriceAsync(string symbol)
         {
-            var apiUri = $"https://financialmodelingprep.com/api/v3/quote/{symbol}?apikey={_config["MarketDataApiKey"]}";
+            var apiUri = $"https://financialmodelingprep.com/api/v3/quote/{symbol}?apikey={_marketDataKey}";
             return await GetMarketData(apiUri);
         }
 
         public async Task<string?> GetFinancialStatement(string symbol)
         {
-            var apiUri = $"https://financialmodelingprep.com/api/v3/financials/income-statement/{symbol}?apikey={_config["MarketDataApiKey"]}";
+            var apiUri = $"https://financialmodelingprep.com/api/v3/financials/income-statement/{symbol}?apikey={_marketDataKey}";
             return await GetMarketData(apiUri);
         }
 
         public async Task<string?> GetKeyMetrics(string symbol)
         {
-            var apiUri = $"https://financialmodelingprep.com/api/v3/key-metrics/{symbol}?apikey={_config["MarketDataApiKey"]}";
+            var apiUri = $"https://financialmodelingprep.com/api/v3/key-metrics/{symbol}?apikey={_marketDataKey}";
             return await GetMarketData(apiUri);
         }
 
@@ -86,7 +89,7 @@ namespace portfolio.Services
             }
             catch (Exception e)
             {
-                return null;
+                throw new Exception($"Market data api request failed");
             }
         }
     }

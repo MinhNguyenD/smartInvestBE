@@ -95,6 +95,12 @@ builder.Services.AddAuthentication(options =>
 // control http request pipeline
 var app = builder.Build();
 
+using (var Scope = app.Services.CreateScope())
+{
+    var context = Scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
+    context.Database.Migrate();
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

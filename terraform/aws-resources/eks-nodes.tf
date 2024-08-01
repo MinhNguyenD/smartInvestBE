@@ -6,7 +6,7 @@ resource "aws_eks_node_group" "example" {
   capacity_type = "SPOT"
   disk_size = 10
   ami_type = "AL2_x86_64"
-  instance_types = [ var.instance_type ]
+  instance_types = [ "t3.small" ]
   scaling_config {
     desired_size = 2
     max_size     = 3
