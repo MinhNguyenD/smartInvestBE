@@ -90,15 +90,15 @@ resource "aws_secretsmanager_secret_version" "smartinvest-user-jwt-secret-versio
 
 resource "aws_secretsmanager_secret_version" "smartinvest-portfolio-jwt-secret-version" {
   secret_id     = data.aws_secretsmanager_secret.smartinvest-portfolio-jwt-secret.id
-  secret_string = "sadsandiusahdsadasnduahe3qansdnas12312312NdjAbdshasdadasdsajdjasdasudhausd"
+  secret_string = ""
 }
 
 resource "aws_secretsmanager_secret_version" "smartinvest-portfolio-marketdata-secret-version" {
   secret_id     = data.aws_secretsmanager_secret.smartinvest-portfolio-marketdata-secret.id
-  secret_string = "qke9LztjQlyLMJZyVYQl0gLcnDtMAbEd"
+  secret_string = ""
 }
 
 resource "aws_secretsmanager_secret_version" "smartinvest-portfolio-OpenAI-secret-version" {
   secret_id     = data.aws_secretsmanager_secret.smartinvest-portfolio-OpenAI-secret.id
-  secret_string = "sk-proj-ShhJkhE47kXIP2IO7mQ4T3BlbkFJBjndW5a02FbLVguYX3vl"
+  secret_string = ""
 }
