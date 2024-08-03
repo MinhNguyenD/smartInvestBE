@@ -85,7 +85,7 @@ resource "aws_secretsmanager_secret_version" "smartinvest-portfolio-rds-secret-v
 
 resource "aws_secretsmanager_secret_version" "smartinvest-user-jwt-secret-version" {
   secret_id     = data.aws_secretsmanager_secret.smartinvest-user-jwt-secret.id
-  secret_string = "sadsandiusahdsadasnduahe3qansdnas12312312NdjAbdshasdadasdsajdjasdasudhausd"
+  secret_string = ""
 }
 
 resource "aws_secretsmanager_secret_version" "smartinvest-portfolio-jwt-secret-version" {
