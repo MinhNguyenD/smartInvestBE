@@ -6,7 +6,7 @@ resource "aws_db_instance" "smartinvest-rds-user" {
   engine_version       = "8.0.35"
   instance_class       = "db.t3.micro"
   username             = "minh"
-  password             = "Lychinhthang144!"
+  password             = ""
   db_subnet_group_name = aws_db_subnet_group.rds-subnet-group.name
   skip_final_snapshot  = true
   parameter_group_name = "default.mysql8.0"
@@ -24,7 +24,7 @@ resource "aws_db_instance" "smartinvest-rds-portfolio" {
   engine_version       = "8.0.35"
   instance_class       = "db.t3.micro"
   username             = "minh"
-  password             = "Lychinhthang144!"
+  password             = ""
   db_subnet_group_name = aws_db_subnet_group.rds-subnet-group.name
   vpc_security_group_ids = [aws_security_group.smartinvest-rds-sg.id]
   skip_final_snapshot  = true
