@@ -1,6 +1,6 @@
-resource "aws_eip" "natgw-ip" {
+resource "aws_eip" "smartinvest-natgw-eip" {
   domain           = "vpc"
   tags = {
-    Name = "smartinvest-vpc-eip"
+    Name = "smartinvest-natgw-eip"
   }
 }
