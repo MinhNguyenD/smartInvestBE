@@ -13,6 +13,10 @@ resource "aws_eks_node_group" "smartinvest-eks-ng" {
     min_size     = 1
   }
 
+  remote_access {
+    source_security_group_ids = [aws_security_group.smartinvest-eks-node-sg.id]
+  }
+
   update_config {
     max_unavailable = 1
   }
