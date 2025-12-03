@@ -1,0 +1,73 @@
+version: '1'
+
+services:
+  user-service:
+    container_name: user-service
+    # Specify the build context for the user service
+    build:
+      context: ./user
+      dockerfile: Dockerfile
+      
+    # Map the host port to the container port
+    ports: 
+      - "8080:8080"
+    
+    networks:
+      - be-network
+  
+  user-db:
+    image: postgres:15
+    env_file:
+      - ./user-db.env
+    ports:
+      - "5433:5432"
+    volumes:
+      - user_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  product-service:
+    container_name: portfolio-service
+    # Specify the build context for the backend
+    build:
+      context: ./portfolio
+      dockerfile: Dockerfile
+    # Map the host port to the container port
+    ports:
+      - "8081:8081"
+
+    networks:
+      - be-network
+  
+  portfolio-db:
+    image: postgres:15
+    env_file:
+      - ./portfolio-db.env
+    ports:
+      - "5434:5432"
+    volumes:
+      - portfolio_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  portfolio-redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - portfolio_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+
+networks: 
+  be-network:
+    driver: bridge
+
+  
+volumes:
+  user_data:
+  portfolio_data:
+  portfolio_redis_data:
