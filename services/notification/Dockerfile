@@ -1,14 +1,14 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 
 WORKDIR /src
-COPY portfolio.csproj .
+COPY api.csproj .
 RUN dotnet restore
 COPY . .
 RUN dotnet publish -c release -o /app
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0
 WORKDIR /app
-EXPOSE 81
-ENV ASPNETCORE_URLS=http://*:81
+EXPOSE 82
+ENV ASPNETCORE_URLS=http://*:82
 COPY --from=build /app .
-ENTRYPOINT ["dotnet", "portfolio.dll"]
+ENTRYPOINT ["dotnet", "notification.dll"]
