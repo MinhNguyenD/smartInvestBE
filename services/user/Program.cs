@@ -56,6 +56,8 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 });
 
 builder.Services.AddDbContext<ApplicationDBContext>(options => options.UseMySql(builder.Configuration.GetConnectionString("DbConnectionString"), new MySqlServerVersion(new Version(8, 0, 35))));
+builder.Services.AddSingleton<KafkaClientHandle>();
+builder.Services.AddSingleton<KafkaProducerService<string, string>>();
 
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>

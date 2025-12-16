@@ -2,6 +2,9 @@
 using api.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Confluent.Kafka;
+using Newtonsoft.Json;
+using api.Dtos;
 
 namespace api;
 
@@ -12,12 +15,14 @@ public class AuthController : ControllerBase
     private readonly UserManager<AppUser> _userManager;
     private readonly SignInManager<AppUser> _signinManager;
     private readonly TokenService _tokenService;
+    private readonly KafkaProducerService<string, string> _kafkaProducer;
 
-    public AuthController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, TokenService tokenService)
+    public AuthController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, TokenService tokenService, KafkaProducerService<string, string> kafkaProducer)
     {
         _userManager = userManager;
         _signinManager = signInManager;
         _tokenService = tokenService;
+        _kafkaProducer = kafkaProducer;
     }
 
     [HttpPost("register")]
@@ -40,6 +45,16 @@ public class AuthController : ControllerBase
                 var roleResult = await _userManager.AddToRoleAsync(newUser, "User");
                 if (roleResult.Succeeded)
                 {
+                    UserCreateNotificationEvent notificationEvent = new UserCreateNotificationEvent()
+                    {
+                        Receipient = newUser.Email!,
+                        Subject = "Welcome to SmartInvest!",
+                        Body = $"Hello {newUser.UserName}, welcome to SmartInvest. We're glad to have you on board!",
+                        IsBodyHtml = false
+                    };
+
+                    await _kafkaProducer.ProduceAsync("email-notification", new Message<string, string>() { Key = newUser.Id, Value = JsonConvert.SerializeObject(notificationEvent) });
+
                     return Ok(new AuthUserDto()
                     {
                         Username = newUser.UserName,
