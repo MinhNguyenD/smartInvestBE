@@ -4,6 +4,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Npgsql;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using portfolio.Data;
 using portfolio.Services;
 
@@ -23,6 +27,34 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 });
+
+var opentelemetry = builder.Services.AddOpenTelemetry();
+
+opentelemetry.ConfigureResource(resource => resource.AddService(microserviceName ?? "Portfolio.Api"))
+.WithTracing(tracing =>
+{
+    tracing
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddNpgsql();
+
+    tracing.AddOtlpExporter(option =>
+    {
+        option.Endpoint = new Uri(builder.Configuration["Otlp:Endpoint"]!);
+    });
+});
+
+opentelemetry.WithMetrics(metrics => metrics
+    .AddAspNetCoreInstrumentation()
+    .AddMeter("Microsoft.AspNetCore.Hosting")
+    .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
+    .AddMeter("System.Net.Http")
+    .AddMeter("System.Net.NameResolution")
+    .AddPrometheusExporter(option =>
+    {
+        option.ScrapeEndpointPath = "/metrics";
+    }));
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(option =>
@@ -92,6 +124,8 @@ builder.Services.AddHttpClient<AnalysisService>(client =>
 });
 
 var app = builder.Build();
+
+app.MapPrometheusScrapingEndpoint();
 
 
 using (var Scope = app.Services.CreateScope())

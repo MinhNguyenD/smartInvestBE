@@ -8,7 +8,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Amazon;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 var environment = builder.Environment.EnvironmentName;
@@ -54,6 +58,33 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 });
+
+var opentelemetry = builder.Services.AddOpenTelemetry();
+
+opentelemetry.ConfigureResource(resource => resource.AddService(microserviceName ?? "Portfolio.Api"))
+.WithTracing(tracing =>
+{
+    tracing
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddNpgsql();
+
+    tracing.AddOtlpExporter(option =>
+    {
+        option.Endpoint = new Uri(builder.Configuration["Otlp:Endpoint"]!);
+    });
+});
+
+opentelemetry.WithMetrics(metrics => metrics
+    .AddAspNetCoreInstrumentation()
+    .AddMeter("Microsoft.AspNetCore.Hosting")
+    .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
+    .AddMeter("System.Net.Http")
+    .AddMeter("System.Net.NameResolution")
+    .AddPrometheusExporter(option =>
+    {
+        option.ScrapeEndpointPath = "/metrics";
+    }));
 
 builder.Services.AddDbContext<ApplicationDBContext>(options => options.UseMySql(builder.Configuration.GetConnectionString("DbConnectionString"), new MySqlServerVersion(new Version(8, 0, 35))));
 builder.Services.AddSingleton<KafkaClientHandle>();

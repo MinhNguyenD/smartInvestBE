@@ -24,6 +24,8 @@ services:
     volumes:
       - user_data:/var/lib/postgresql/data
     restart: unless-stopped
+    networks:
+      - be-network
 
   product-service:
     container_name: portfolio-service
@@ -47,6 +49,8 @@ services:
     volumes:
       - portfolio_data:/var/lib/postgresql/data
     restart: unless-stopped
+    networks:
+      - be-network
 
   portfolio-redis:
     image: redis:7-alpine
@@ -60,6 +64,8 @@ services:
       timeout: 10s
       retries: 3
     restart: unless-stopped
+    networks:
+      - be-network
 
 
   zookeeper:
@@ -70,6 +76,8 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - "2181:2181"
+    networks:
+      - be-network
 
   kafka:
     image: confluentinc/cp-kafka:7.5.0
@@ -84,6 +92,8 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - be-network
 
   kafdrop:
     image: obsidiandynamics/kafdrop:latest
@@ -94,6 +104,8 @@ services:
       - "9000:9000"
     environment:
       KAFKA_BROKERCONNECT: kafka:9092
+    networks:
+      - be-network
 
   notification-service:
     container_name: email-service
@@ -109,12 +121,46 @@ services:
     networks:
       - be-network
 
+prometheus:
+  image: prom/prometheus:latest
+  container_name: prometheus
+  command:
+    - '--config.file=/etc/prometheus/prometheus.yml'
+  volumes:
+    -  ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+    - prometheus-data:/prometheus
+  ports:
+    - "9090:9090"
+  networks:
+    - be-network
+
+grafana:
+  image: grafana/grafana-oss:latest
+  container_name: grafana
+  volumes:
+    - grafana-data:/var/lib/grafana
+  ports:
+    - "3000:3000"
+  networks:
+    - be-network
+
+jaeger: 
+  image: jaegertracing/all-in-one:latest
+  container_name: jaeger
+  ports:
+    - "4317:4317"
+    - "4318:4318"
+    - "16686:16686"
+  networks:
+    - be-network
+
 networks: 
   be-network:
     driver: bridge
-
   
 volumes:
   user_data:
   portfolio_data:
   portfolio_redis_data:
+  prometheus-data:
+  grafana-data:
