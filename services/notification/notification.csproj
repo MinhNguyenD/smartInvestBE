@@ -4,12 +4,19 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>6446b587-4f67-4327-938a-185f04c28450</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Confluent.Kafka" Version="2.12.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+	<PackageReference Include="Npgsql.OpenTelemetry" Version="8.0.6" />
+	<PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.14.0" />
+	<PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.14.0-beta.1" />
+	<PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.14.0" />
+	<PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.14.0" />
+	<PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.14.0" />
   </ItemGroup>
 
 </Project>

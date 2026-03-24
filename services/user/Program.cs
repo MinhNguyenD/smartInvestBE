@@ -13,16 +13,26 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Amazon;
 using Npgsql;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Logs;
 
 var builder = WebApplication.CreateBuilder(args);
 var environment = builder.Environment.EnvironmentName;
 var microserviceName = builder.Configuration["MicroserviceName"];
-builder.Configuration.AddSecretsManager(region: RegionEndpoint.USEast1, configurator: config => {
-    config.SecretFilter = record => record.Name.StartsWith($"{environment}_{microserviceName}_");
-    config.KeyGenerator = (_, name) => name
-                    .Replace($"{environment}_{microserviceName}_", string.Empty)
-                    .Replace("__", ":");
-});
+if (!builder.Environment.IsDevelopment())
+{
+    //builder.Configuration.AddSecretsManager(region: RegionEndpoint.USEast1, configurator: config => {
+    //    config.SecretFilter = record => record.Name.StartsWith($"{environment}_{microserviceName}_");
+    //    config.KeyGenerator = (_, name) => name
+    //                    .Replace($"{environment}_{microserviceName}_", string.Empty)
+    //                    .Replace("__", ":");
+    //});
+}
+else
+{
+    //builder.Configuration.AddUserSecrets<Program>();
+}
+
 builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -59,19 +69,25 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 });
 
+// Define a common resource to correlate data in Grafana/Jaeger
+var resourceBuilder = ResourceBuilder.CreateDefault()
+    .AddService(microserviceName ?? "User.Api");
+
 var opentelemetry = builder.Services.AddOpenTelemetry();
 
-opentelemetry.ConfigureResource(resource => resource.AddService(microserviceName ?? "Portfolio.Api"))
+opentelemetry.ConfigureResource(resource => resource.AddService(microserviceName ?? "User.Api"))
 .WithTracing(tracing =>
 {
     tracing
-        .AddAspNetCoreInstrumentation()
-        .AddHttpClientInstrumentation()
-        .AddNpgsql();
+        .AddAspNetCoreInstrumentation() // incoming http request traces
+        .AddHttpClientInstrumentation() //http traces
+        .AddNpgsql() // sql traces
+        .AddSource("KafkaProducer");// custom traces from Kafka producer
 
     tracing.AddOtlpExporter(option =>
     {
         option.Endpoint = new Uri(builder.Configuration["Otlp:Endpoint"]!);
+        option.Protocol = OtlpExportProtocol.Grpc;
     });
 });
 
@@ -81,12 +97,26 @@ opentelemetry.WithMetrics(metrics => metrics
     .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
     .AddMeter("System.Net.Http")
     .AddMeter("System.Net.NameResolution")
-    .AddPrometheusExporter(option =>
+    .AddOtlpExporter(option =>
     {
-        option.ScrapeEndpointPath = "/metrics";
+        option.Endpoint = new Uri(builder.Configuration["Otlp:Endpoint"]!);
+        option.Protocol = OtlpExportProtocol.Grpc;
     }));
 
-builder.Services.AddDbContext<ApplicationDBContext>(options => options.UseMySql(builder.Configuration.GetConnectionString("DbConnectionString"), new MySqlServerVersion(new Version(8, 0, 35))));
+opentelemetry.WithLogging(logging =>
+{
+    //logging.SetResourceBuilder(resourceBuilder);
+    logging.AddOtlpExporter(option =>
+    {
+        option.Endpoint = new Uri(builder.Configuration["Otlp:Endpoint"]!);
+        option.Protocol = OtlpExportProtocol.Grpc;
+    });
+});
+
+
+
+builder.Services.AddDbContext<ApplicationDBContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DbConnectionString")));
 builder.Services.AddSingleton<KafkaClientHandle>();
 builder.Services.AddSingleton<KafkaProducerService<string, string>>();
 

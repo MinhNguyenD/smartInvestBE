@@ -9,15 +9,14 @@ namespace notification.Services
         private readonly SmtpClient _smtpClient;
         public EmailService(IConfiguration configuration) { 
             _configuration = configuration;
-            var smtpSettings = _configuration.GetSection("Smtp");
             _smtpClient = new SmtpClient
             {
-                Host = smtpSettings.GetValue<string>("Host"),
-                Port = smtpSettings.GetValue<int>("Port"),
+                Host = _configuration["EMAILSERVER:HOST"]!,
+                Port = int.Parse(_configuration["EMAILSERVER:PORT"]!),
                 EnableSsl = true,
                 Credentials = new System.Net.NetworkCredential(
-                    smtpSettings.GetValue<string>("Username"),
-                    smtpSettings.GetValue<string>("Password"))
+                    _configuration["EMAILSERVER:USERNAME"]!,
+                    _configuration["EMAILSERVER:PASSWORD"]!)
             };
         }
 

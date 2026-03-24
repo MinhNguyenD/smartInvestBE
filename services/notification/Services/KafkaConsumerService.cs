@@ -1,7 +1,10 @@
 ﻿
 using Confluent.Kafka;
-using notification.Dto;
 using Newtonsoft.Json;
+using notification.Dto;
+using OpenTelemetry;
+using OpenTelemetry.Context.Propagation;
+using System.Diagnostics;
 
 namespace notification.Services
 {
@@ -10,7 +13,8 @@ namespace notification.Services
         private readonly string topic;
         private readonly IConsumer<string, string> kafkaConsumer;
         private readonly EmailService _emailService;
-
+        static readonly ActivitySource ConsumerActivity = new("KafkaConsumer");
+        static readonly TextMapPropagator Propagator = Propagators.DefaultTextMapPropagator;
         public KafkaConsumerService(IConfiguration configuration, EmailService emailService)
         {
             var kafkaSettings = configuration.GetSection("Kafka");
@@ -37,6 +41,23 @@ namespace notification.Services
                 try
                 {
                     var consumerResult = this.kafkaConsumer.Consume(cancellationToken);
+                    // Extract context from Kafka headers
+                    var parentContext = Propagator.Extract(
+                        default,
+                        consumerResult.Message.Headers,
+                        (h, k) =>
+                        {
+                            var header = h.FirstOrDefault(x => x.Key == k);
+                            return header == null
+                                ? Enumerable.Empty<string>()
+                                : new[] { System.Text.Encoding.UTF8.GetString(header.GetValueBytes()) };
+                        });
+                    Baggage.Current = parentContext.Baggage;
+
+                    using var activity = ConsumerActivity.StartActivity(
+                        "kafka.consume",
+                        ActivityKind.Consumer,
+                        parentContext.ActivityContext);
                     Console.WriteLine($"{consumerResult.Message.Key}: {consumerResult.Message.Value}ms");
                     EmailMessage emailMessage = JsonConvert.DeserializeObject<EmailMessage>(consumerResult.Message.Value);
                     _emailService.SendEmail(emailMessage);

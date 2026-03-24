@@ -8,7 +8,7 @@ RUN dotnet publish -c release -o /app
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0
 WORKDIR /app
-EXPOSE 81
-ENV ASPNETCORE_URLS=http://*:81
+EXPOSE 80
+ENV ASPNETCORE_URLS=http://*:80
 COPY --from=build /app .
 ENTRYPOINT ["dotnet", "portfolio.dll"]
