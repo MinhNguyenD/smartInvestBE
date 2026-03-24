@@ -307,3 +307,5 @@ terraform.tfstate.backup
 *.tfstate
 *.tfstate.*
 *.env
+.terraform.tfstate.lock.info
+.terraform/
