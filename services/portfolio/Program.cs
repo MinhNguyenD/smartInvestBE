@@ -1,5 +1,6 @@
 using Amazon;
 using Amazon.SimpleNotificationService;
+using api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -105,6 +106,8 @@ builder.Services.AddHttpClient<AnalysisService>(client =>
 {
     client.DefaultRequestHeaders.Add("Authorization", $"Bearer ");
 });
+builder.Services.AddSingleton<KafkaClientHandle>();
+builder.Services.AddSingleton<KafkaProducerService<string, string>>();
 
 // Define a common resource to correlate data in Grafana/Jaeger
 var resourceBuilder = ResourceBuilder.CreateDefault()
