@@ -121,7 +121,8 @@ opentelemetry.ConfigureResource(resource => resource.AddService(microserviceName
     tracing
         .AddAspNetCoreInstrumentation()
         .AddHttpClientInstrumentation()
-        .AddNpgsql();
+        .AddNpgsql()
+        .AddSource("KafkaProducer");// custom traces from Kafka producer
 
     tracing.AddOtlpExporter(option =>
     {

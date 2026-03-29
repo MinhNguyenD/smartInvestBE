@@ -19,6 +19,7 @@ namespace notification.Services
         {
             var kafkaSettings = configuration.GetSection("Kafka");
             topic = kafkaSettings.GetValue<string>("Topic");
+            Console.WriteLine($"Kafka Consumer will subscribe to topic: {topic}");
             var consumerConfig = new ConsumerConfig
             {
                 BootstrapServers = kafkaSettings.GetValue<string>("BootstrapServers"),

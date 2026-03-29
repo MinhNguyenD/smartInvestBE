@@ -71,6 +71,19 @@ services:
   #   networks:
   #     - be-network
 
+  analyzer-service:
+    container_name: analyzer-service
+    env_file:
+      - ./analyzer-service.env
+    # Specify the build context for the backend
+    build:
+      context: ./analyzer
+      dockerfile: Dockerfile
+    # Map the host port to the container port
+    ports:
+      - "82:80"
+    networks:
+      - be-network
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
     container_name: zookeeper
@@ -96,6 +109,11 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "kafka:9092", "--list"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     networks:
       - be-network
 
@@ -114,7 +132,8 @@ services:
   notification-service:
     container_name: notification-service
     depends_on:
-      - kafka
+      kafka:
+        condition: service_healthy
     build:
       context: ./notification
       dockerfile: Dockerfile

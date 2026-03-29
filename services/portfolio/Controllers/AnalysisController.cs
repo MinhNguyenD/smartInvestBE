@@ -1,16 +1,20 @@
+using Amazon.SimpleNotificationService;
+using Amazon.SimpleNotificationService.Model;
+using api.Services;
+using Confluent.Kafka;
+using HtmlAgilityPack;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using portfolio.Dtos;
+using portfolio.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Amazon.SimpleNotificationService;
-using Amazon.SimpleNotificationService.Model;
-using HtmlAgilityPack;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using portfolio.Services;
 
 namespace portfolio.Controllers
 {
@@ -21,13 +25,15 @@ namespace portfolio.Controllers
     {
         private readonly IAnalysisService _analyzeService;
         private readonly IAmazonSimpleNotificationService _snsClient;
+        private readonly KafkaProducerService<string, string> _kafkaProducer;
         private string _topic = "SmartInvest-";
 
 
-        public AnalysisController(IAnalysisService analyzeService, IAmazonSimpleNotificationService snsClient)
+        public AnalysisController(IAnalysisService analyzeService, KafkaProducerService<string, string> kafkaProducer, IAmazonSimpleNotificationService snsClient)
         {
             _analyzeService = analyzeService;
             _snsClient = snsClient;
+            _kafkaProducer = kafkaProducer;
         }
 
 
@@ -98,53 +104,86 @@ namespace portfolio.Controllers
             }
         }
 
+        //[HttpPost("{id:int}/email")]
+        //public async Task<IActionResult> SendEmail(int id){
+        //    var userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        //    var username = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+        //    _topic += username;
+        //    var analysis = await _analyzeService.GetAnalysisByIdAsync(id);
+        //    if(analysis == null){
+        //        return NotFound("Analysis not found");
+        //    }
+        //    var topicArnExists = await _snsClient.FindTopicAsync(_topic);
+        //    string topicArn = "";
+        //    if (topicArnExists == null)
+        //    {
+        //        var createTopicResponse = await _snsClient.CreateTopicAsync(_topic);
+        //        topicArn = createTopicResponse.TopicArn;
+        //        SubscribeRequest subscribeRequest = new SubscribeRequest()
+        //        {
+        //            TopicArn = topicArn,
+        //            ReturnSubscriptionArn = true,
+        //            Protocol = "email",
+        //            Endpoint = userEmail,
+        //        };
+
+        //        var response = await _snsClient.SubscribeAsync(subscribeRequest);
+        //    }
+        //    else
+        //    {
+        //        topicArn = topicArnExists.TopicArn;
+        //    }
+
+        //    var message = analysis.Content;
+        //    var doc = new HtmlDocument();
+        //    doc.LoadHtml(message);
+        //    message = doc.DocumentNode.InnerText;
+
+        //    var subject = $"{analysis.StockSymbol}'s Financial Analysis";
+        //    //create and publish a new message to the sns topic arn
+        //    var publishRequest = new PublishRequest()
+        //    {
+        //        TopicArn = topicArn,
+        //        Message = message,
+        //        Subject = subject
+        //    };
+
+        //    await _snsClient.PublishAsync(publishRequest);
+        //    return Ok();
+        //}
+
+
         [HttpPost("{id:int}/email")]
-        public async Task<IActionResult> SendEmail(int id){
+        public async Task<IActionResult> SendEmail(int id)
+        {
             var userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var username = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
             _topic += username;
             var analysis = await _analyzeService.GetAnalysisByIdAsync(id);
-            if(analysis == null){
+            if (analysis == null)
+            {
                 return NotFound("Analysis not found");
             }
-            var topicArnExists = await _snsClient.FindTopicAsync(_topic);
-            string topicArn = "";
-            if (topicArnExists == null)
-            {
-                var createTopicResponse = await _snsClient.CreateTopicAsync(_topic);
-                topicArn = createTopicResponse.TopicArn;
-                SubscribeRequest subscribeRequest = new SubscribeRequest()
-                {
-                    TopicArn = topicArn,
-                    ReturnSubscriptionArn = true,
-                    Protocol = "email",
-                    Endpoint = userEmail,
-                };
-
-                var response = await _snsClient.SubscribeAsync(subscribeRequest);
-            }
-            else
-            {
-                topicArn = topicArnExists.TopicArn;
-            }
-
+            string topic = "email-notification";           
             var message = analysis.Content;
-            var doc = new HtmlDocument();
-            doc.LoadHtml(message);
-            message = doc.DocumentNode.InnerText;
+            //var doc = new HtmlDocument();
+            //doc.LoadHtml(message);
+            //message = doc.DocumentNode.InnerText;
 
             var subject = $"{analysis.StockSymbol}'s Financial Analysis";
             //create and publish a new message to the sns topic arn
-            var publishRequest = new PublishRequest()
+            var analysisEmail = new AnalysisEmail()
             {
-                TopicArn = topicArn,
-                Message = message,
-                Subject = subject
+                Receipient = userEmail!,
+                Subject = subject,
+                Body = message,
+                IsBodyHtml = true,
             };
+            await _kafkaProducer.ProduceAsync("email-notification", new Message<string, string>() { Key = id.ToString(), Value = JsonConvert.SerializeObject(analysisEmail) });
 
-            await _snsClient.PublishAsync(publishRequest);
             return Ok();
         }
+
 
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteAnalysisAsync(int id){

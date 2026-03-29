@@ -24,7 +24,7 @@ namespace notification.Services
         {
             MailMessage mailMessage = new MailMessage
             {
-                From = new MailAddress(emailMessage.From),
+                From = new MailAddress(_configuration["EMAILSERVER:USERNAME"]!),
                 To = { new MailAddress(emailMessage.To) },
                 Subject = emailMessage.Subject,
                 Body = emailMessage.Body,
